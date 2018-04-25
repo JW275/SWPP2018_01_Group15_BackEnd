@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from snuariapi.models import *
 from snuariapi.serializers import *
 
-domain = 'highnoo.com'
+from config import domain
 
 class LoginView(APIView):
     def post(self, request):
