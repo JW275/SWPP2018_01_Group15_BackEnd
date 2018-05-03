@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^login/$', views.LoginView.as_view()),
     url(r'^logout/$', views.LogoutView.as_view()),
     url(r'^club/$', views.ClubListView.as_view()),
+    url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view()),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]

@@ -44,3 +44,25 @@ class ClubListView(APIView):
             club.admin.add(request.user)
             return Response({'id':club.id})
         return Response('', status=400) # Something Wrong
+
+class ClubDetailView(APIView):
+    def get(self, request, pk=None):
+        club = Club.objects.get(pk=pk)
+        serializer = ClubDetailSerializer(club)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        club = Club.objects.get(pk=pk)
+        serializer = ClubDetailSerializer(club, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        club = Club.objects.get(pk=pk)
+        club.delete()
+        return Response('')
+
+
+
