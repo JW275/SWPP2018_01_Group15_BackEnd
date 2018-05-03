@@ -28,6 +28,12 @@ class LogoutView(APIView):
         response['Set-Cookie'] = 'auth=; HttpOnly; Domain={}; PATH=/; Expires={}'.format(domain, 'Tue, 27 Nov 1990 22:31:29 GMT')
         return response
 
+class UserDetailView(APIView):
+    def get(self, request, pk=None):
+        user = User.objects.get(pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
 class ClubListView(APIView):
     def get(self, request):
         club = Club.objects.all()

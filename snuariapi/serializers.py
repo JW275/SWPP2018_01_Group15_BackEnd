@@ -2,9 +2,10 @@ from rest_framework import serializers
 from snuariapi.models import *
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    club = serializers.PrimaryKeyRelatedField(source='club_members', many=True, read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'username', 'email',)
+        fields = ('id', 'username', 'email', 'club',)
 
 class ClubListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
