@@ -64,5 +64,17 @@ class ClubDetailView(APIView):
         club.delete()
         return Response('')
 
+class ClubJoinView(APIView):
+    # apply to club
+    def post(self, request, pk=None):
+        club = Club.objects.get(pk=pk)
+        club.waitings.add(request.user)
+        return Response('')
+    
+    # cancel apply
+    def delete(self, request, pk=None):
+        club = Club.objects.get(pk=pk)
+        club.waitings.remove(request.user)
+        return Response('')
 
 
