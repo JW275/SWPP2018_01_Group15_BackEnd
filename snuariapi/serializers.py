@@ -4,4 +4,4 @@ from snuariapi.models import *
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email',)
+        fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year')
