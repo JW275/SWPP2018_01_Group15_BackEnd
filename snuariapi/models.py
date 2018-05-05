@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
 
 now = datetime.datetime.now()
 
-class Student(User):
+class User(AbstractUser):
     name = models.CharField(max_length=20)
     college = models.CharField(max_length=20)
     major = models.CharField(max_length=20)
