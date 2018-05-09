@@ -123,3 +123,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# REST framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'snuariapi.auth.CookieAuthentication',
+    )
+}
