@@ -29,6 +29,28 @@ class LogoutView(APIView):
         response['Set-Cookie'] = 'auth=; HttpOnly; Domain={}; PATH=/; Expires={}'.format(domain, 'Tue, 27 Nov 1990 22:31:29 GMT')
         return response
 
-class SignupView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class SignupView(APIView):
+    def post(self, request):
+        password = request.data.get('password', None)
+        if password is None or password is '':
+            return Response('', status=400)
+
+        email = request.data.get('email', None)
+        if email is not None:
+            if not email.endswith('@snu.ac.kr'):
+                return Response('', status=400)
+
+        user_serializer = UserSerializer(data=request.data)
+        profile_serializer = ProfileSerializer(data=request.data)
+        if user_serializer.is_valid() and profile_serializer.is_valid():
+            user = user_serializer.save()
+            profile_serializer = ProfileSerializer(user.profile, data=request.data)
+            if profile_serializer.is_valid():
+                profile_serializer.save()
+                user.set_password(password)
+                user.save()
+                return Response({'id':user.id})
+
+        return Response('', status=400)
+
+
