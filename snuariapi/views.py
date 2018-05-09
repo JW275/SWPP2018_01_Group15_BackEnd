@@ -41,6 +41,7 @@ class ClubListView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        print(request.user)
         if request.user.is_anonymous: # if not a valid user
             return Response('user', status=400)
         serializer = ClubListSerializer(data=request.data)
