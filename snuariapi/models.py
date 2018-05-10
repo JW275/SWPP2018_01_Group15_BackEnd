@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.dispatch import receiver
+from django.utils.crypto import get_random_string
 
 import datetime
 
@@ -23,3 +24,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+class VerifyToken(models.Model):
+    token = models.CharField(max_length=32, unique=True)
+    user = models.ForeignKey(User, models.CASCADE, related_name='verify_token')
+

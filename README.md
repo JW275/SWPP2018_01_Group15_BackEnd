@@ -3,6 +3,12 @@
 
 ## `<root>/config.py`
 ```
-allowed_hosts = 'http://front_domain/'
+frontend = 'http://front_domain'
 domain = 'domain'
+smtp = {
+    'host': 'smtp.gmail.com',
+    'port': 587,
+    'email': 'example@gmail.com',
+    'password': 'pass'
+}
 ```
