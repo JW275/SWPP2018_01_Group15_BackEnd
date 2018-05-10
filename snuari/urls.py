@@ -21,6 +21,7 @@ from snuariapi import views
 urlpatterns = [
     url(r'^login/$', views.LoginView.as_view()),
     url(r'^logout/$', views.LogoutView.as_view()),
+    url(r'^me/$', views.UserSelfView.as_view()),
     url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view()),
     url(r'^club/$', views.ClubListView.as_view()),
     url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view()),
