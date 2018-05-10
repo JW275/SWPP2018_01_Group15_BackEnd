@@ -1,4 +1,4 @@
-from config import allowed_hosts
+from config import frontend
 
 class MyMiddleware:
     def __init__(self, get_response):
@@ -6,7 +6,7 @@ class MyMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        response['Access-Control-Allow-Origin'] = allowed_hosts
+        response['Access-Control-Allow-Origin'] = frontend
         response['Access-Control-Allow-Methods'] = 'POST, GET, DELETE, PUT, OPTIONS'
         response['Access-Control-Max-Age'] = 1000
         response['Access-Control-Allow-Headers'] = 'origin, content-type, accept, Authorization, Set-Cookie'
