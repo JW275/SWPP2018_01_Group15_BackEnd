@@ -19,14 +19,14 @@ from django.conf.urls import url, include
 from snuariapi import views
 
 urlpatterns = [
-    url(r'^login/$', views.LoginView.as_view()),
-    url(r'^logout/$', views.LogoutView.as_view()),
-    url(r'^me/$', views.UserSelfView.as_view()),
-    url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view()),
-    url(r'^club/$', views.ClubListView.as_view()),
-    url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view()),
-    url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view()),
+    url(r'^login/$', views.LoginView.as_view(), name='login'),
+    url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+    url(r'^me/$', views.UserSelfView.as_view(), name='user_self'),
+    url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view(), name='user_detail'),
+    url(r'^club/$', views.ClubListView.as_view(), name='club_list'),
+    url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view(), name='club_detail'),
+    url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view(), name='club_join'),
+    url(r'^signup/$', views.SignupView.as_view(), name='signup'),
+    url(r'^verify/$', views.VerifyView.as_view(), name='verify'),
     url(r'^api-auth/', include('rest_framework.urls')),
-    url(r'^signup/$', views.SignupView.as_view()),
-    url(r'^verify/$', views.VerifyView.as_view()),
 ]
