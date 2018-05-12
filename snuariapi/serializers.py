@@ -37,6 +37,8 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     college = serializers.CharField(source='profile.college')
     major = serializers.CharField(source='profile.major')
     admission_year = serializers.IntegerField(source='profile.admission_year')
+    clubs_as_admin = ClubListSerializer(many=True, source='club_admin')
+    clubs_as_members = ClubListSerializer(many=True, source='club_members')
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year',)
+        fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
