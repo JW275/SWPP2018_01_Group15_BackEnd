@@ -51,7 +51,7 @@ class LoginViewTests(TestCase):
         response = self.client.post(path=path, data=data)
         self.assertEqual(response.status_code, 400)
 
-class LogoutViewTest(TestCase):
+class LogoutViewTests(TestCase):
     def setUp(self):
         self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
 
@@ -61,5 +61,108 @@ class LogoutViewTest(TestCase):
         path = reverse('logout')
 
         response = self.client.post(path=path, data={})
+        self.assertEqual(response.status_code, 200)
+
+class UserSelfViewTests(TestCase):
+    def setUp(self):
+        self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
+
+    def test_get_info(self):
+        login(self.client, self.user)
+
+        path = reverse('user_self')
+
+        response = self.client.get(path=path)
+        result = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(result['id'], self.user.id)
+
+    def test_get_info_without_login(self):
+        path = reverse('user_self')
+
+        response = self.client.get(path=path)
+        self.assertEqual(response.status_code, 400)
+
+class UserDetailVeiwTests(TestCase):
+    def setUp(self):
+        self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
+
+    def test_get_info(self):
+        path = reverse('user_detail', kwargs={'pk': self.user.id})
+
+        response = self.client.get(path=path)
+        result = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(result['username'], self.user.username)
+
+class ClubListViewTests(TestCase):
+    def setUp(self):
+        self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
+
+    def test_get_club_info(self):
+        path = reverse('club_list')
+
+        response = self.client.get(path=path)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_club(self):
+        login(self.client, self.user)
+
+        path = reverse('club_list')
+        data = {
+            'name': 'test club',
+            'scope': '공과대학',
+            'category': '봉사',
+            'introduction': 'intro'
+        }
+        
+        response = self.client.post(path=path, data=data)
+        result = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(result['id'])
+
+    def test_post_club_without_login(self):
+        path = reverse('club_list')
+        data = {
+            'name': 'test club',
+            'scope': '공과대학',
+            'category': '봉사',
+            'introduction': 'intro'
+        }
+        
+        response = self.client.post(path=path, data=data)
+        self.assertEqual(response.status_code, 400)
+
+class ClubDetailViewTests(TestCase):
+    def setUp(self):
+        self.club = Club.objects.create(
+                name='test club',
+                scope='공과대학',
+                category='봉사',
+                introduction='intro'
+                )
+        self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
+
+    def test_get_club_info(self):
+        path = reverse('club_detail', kwargs={'pk': self.club.id})
+
+        response = self.client.get(path=path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_club_info(self):
+        path = reverse('club_detail', kwargs={'pk': self.club.id})
+        data = {"name": "edited name"}
+
+        response = self.client.put(path=path, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_club(self):
+        path = reverse('club_detail', kwargs={'pk': self.club.id})
+
+        response = self.client.delete(path=path)
         self.assertEqual(response.status_code, 200)
 
