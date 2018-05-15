@@ -38,4 +38,7 @@ class Club(models.Model):
     category = models.CharField(max_length=20)
     introduction = models.TextField()
     
+class Board(models.Model):
+    name = models.CharField(max_length=20)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
 
