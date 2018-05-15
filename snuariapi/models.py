@@ -40,5 +40,5 @@ class Club(models.Model):
     
 class Board(models.Model):
     name = models.CharField(max_length=20)
-    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, related_name='boards', on_delete=models.CASCADE)
 
