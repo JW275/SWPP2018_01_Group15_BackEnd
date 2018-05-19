@@ -17,9 +17,10 @@ class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='boards')
     class Meta:
         model = Club
-        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction',)
+        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction','boards',)
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
