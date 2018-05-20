@@ -43,3 +43,8 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
+
+class BoardListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Board
+        fields = ('id', 'name', 'club',)
