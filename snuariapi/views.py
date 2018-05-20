@@ -141,3 +141,18 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class BoardListView(APIView):
+    def get(self, request):
+        club = Board.objects.all()
+        serializer = BoardListSerializer(board, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if request.user.is_anonymous: # if not a valid user
+            return Response('user', status=400)
+        serializer = BoardListSerializer(data=request.data)
+        if serializer.is_valid():
+            board = serializer.save()
+            return Response({'id':board.id})
+        return Response('', status=400) # Something Wrong
