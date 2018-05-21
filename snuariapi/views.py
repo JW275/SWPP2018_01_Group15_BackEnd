@@ -141,3 +141,18 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class EventListView(APIView):
+    def get(self, request):
+        event = Event.objects.all()
+        serializer = EventListSerializer(event, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        if request.user.is_anonymous:
+            return Response('user', status=400)
+        serializer = EventListSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            return Response({'id':event.id})
+        return Response('', status=400)
