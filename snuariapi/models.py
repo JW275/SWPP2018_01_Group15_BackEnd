@@ -37,5 +37,12 @@ class Club(models.Model):
     scope = models.CharField(max_length=20)
     category = models.CharField(max_length=20)
     introduction = models.TextField()
-    
+
+class Event(models.Model):
+    name = models.CharField(max_length=20)
+    content = models.TextField()
+    date = models.DateTimeField()
+    participants = models.ManyToManyField(User, related_mane='event_participants')
+    absentees = models.ManyToManyField(User, related_name='event_absentees')
+    club = models.ForeignKey(Club, related_name='events', on_delete=models.CASCADE)
 
