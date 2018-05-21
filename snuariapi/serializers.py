@@ -42,3 +42,10 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
+
+class EventListSerializer(serializers.HyperlinkedModelSerializer):
+    participants = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    absentees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'content', 'date', 'participants', 'absentees', 'club', )
