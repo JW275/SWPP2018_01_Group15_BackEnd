@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^signup/$', views.SignupView.as_view()),
     url(r'^verify/$', views.VerifyView.as_view()),
+    url(r'^event/$', views.EventListView.as_view(), name='event_list'),
 ]
