@@ -141,3 +141,18 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class ClubSearchView(APIView):
+    def get(self, request):
+        club = Club.objects.all()
+
+        name = request.GET.get('name', None)
+        if name:
+            club = club.filter(name__contains=name)
+
+        category = request.GET.get('category', None)
+        if category:
+            club = club.filter(category=category)
+
+        serializer = ClubListSerializer(club, many=True)
+        return Response(serializer.data)

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^me/$', views.UserSelfView.as_view()),
     url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view()),
     url(r'^club/$', views.ClubListView.as_view()),
+    url(r'^club/search/$', views.ClubSearchView.as_view()),
     url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view()),
     url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view()),
     url(r'^api-auth/', include('rest_framework.urls')),
