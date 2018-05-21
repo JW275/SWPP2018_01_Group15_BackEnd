@@ -144,7 +144,7 @@ class VerifyView(APIView):
 
 class BoardListView(APIView):
     def get(self, request):
-        club = Board.objects.all()
+        board = Board.objects.all()
         serializer = BoardListSerializer(board, many=True)
         return Response(serializer.data)
 
