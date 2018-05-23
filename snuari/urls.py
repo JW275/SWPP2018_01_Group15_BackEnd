@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^signup/$', views.SignupView.as_view()),
     url(r'^verify/$', views.VerifyView.as_view()),
     url(r'^event/$', views.EventListView.as_view(), name='event_list'),
+    url(r'^event/(?P<pk>[0-9]+)/$', views.EventDetailView.as_view(), name='event_detail'),
 ]
