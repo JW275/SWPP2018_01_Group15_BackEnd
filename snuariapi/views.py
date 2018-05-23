@@ -12,6 +12,10 @@ from snuariapi.services import *
 
 from config import domain
 
+from datetime import datetime
+
+now = datetime.now()
+
 class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username', None)
@@ -144,15 +148,45 @@ class VerifyView(APIView):
 
 class EventListView(APIView):
     def get(self, request):
-        event = Event.objects.all()
-        serializer = EventListSerializer(event, many=True)
+        time = request.GET.get('need', None)
+        clubid = request.GET.get('clubid', None)
+        if clubid == None:
+            return Response('', status=400)
+        if time == None:
+            events = Event.objects.filter(club = clubid)
+        else if time == 'future':
+            events = Event.objects.filter(club = clubid).filter(date >= now)
+        else if time == 'past':
+            events = Event.objects.filter(club = clubid).filter(date < now)
+        else:
+            return Response('', status=400)
+        serializer = EventListSerializer(events, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request):
         if request.user.is_anonymous:
             return Response('user', status=400)
         serializer = EventListSerializer(data=request.data)
         if serializer.is_valid():
             event = serializer.save()
-            return Response({'id':event.id})
+            return Response(event)
         return Response('', status=400)
+        
+class EventDetailView(APIView):
+    def get(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.delete()
+        return Response('')
