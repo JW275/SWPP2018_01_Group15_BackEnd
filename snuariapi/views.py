@@ -154,9 +154,9 @@ class EventListView(APIView):
             return Response('', status=400)
         if time == None:
             events = Event.objects.filter(club = clubid)
-        else if time == 'future':
+        elif time == 'future':
             events = Event.objects.filter(club = clubid).filter(date >= now)
-        else if time == 'past':
+        elif time == 'past':
             events = Event.objects.filter(club = clubid).filter(date < now)
         else:
             return Response('', status=400)
@@ -169,9 +169,14 @@ class EventListView(APIView):
         serializer = EventListSerializer(data=request.data)
         if serializer.is_valid():
             event = serializer.save()
-            return Response(event)
+            time = None
+            if event.date >= now:
+                time = 'future'
+            else:
+                time = 'past'
+            return Response({'event': event, 'time': time})   #is this right?
         return Response('', status=400)
-        
+
 class EventDetailView(APIView):
     def get(self, request, pk=None):
         event = Event.objects.get(pk=pk)

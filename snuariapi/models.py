@@ -47,4 +47,4 @@ class Event(models.Model):
     future_attendees = models.ManyToManyField(User, related_name='future_attend_events')
     future_absentees = models.ManyToManyField(User, related_name='future_absent_events')
     # have attended (past event)
-    past_attendees = models.ManyToManyField(User, related_mane='past_attend_events')
+    past_attendees = models.ManyToManyField(User, related_name='past_attend_events')
