@@ -37,16 +37,13 @@ class Club(models.Model):
     scope = models.CharField(max_length=20)
     category = models.CharField(max_length=20)
     introduction = models.TextField()
-    
-class Accounting(models.Model):
-    club = models.ForeignKey(Club, models.CASCADE, related_name='club_accounting')
 
-class AccountingEntry(models.Model):
+class Accounting(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField()
-    accounting = models.ForeignKey(Accounting, models.CASCADE, related_name='accounting_entry')
+    updated_at = models.DateTimeField(null=True)
+    club = models.ForeignKey(Club, models.CASCADE, related_name='club_accounting', null=True)
     is_income = models.BooleanField()
     money = models.IntegerField()
     date = models.DateTimeField()
-    writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer')
+    writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer', null=True)
     content = models.TextField()

@@ -29,4 +29,7 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^signup/$', views.SignupView.as_view()),
     url(r'^verify/$', views.VerifyView.as_view()),
+    url(r'^account/$', views.AccountingListView.as_view()),
+    url(r'^account/(?P<pk>[0-9]+)/$', views.AccountingDetailView.as_view()),
+    url(r'^account/statistic/(?P<pk>[0-9]+)/$', views.AccountingStatisticView.as_view()),
 ]
