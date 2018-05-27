@@ -17,9 +17,11 @@ class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Club
-        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction',)
+        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction', 'boards', 'events',)
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -33,10 +35,10 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
-    name = serializers.CharField(source='profile.name')
-    college = serializers.CharField(source='profile.college')
-    major = serializers.CharField(source='profile.major')
-    admission_year = serializers.IntegerField(source='profile.admission_year')
+    name = serializers.CharField(source='profile.name', read_only=True)
+    college = serializers.CharField(source='profile.college', read_only=True)
+    major = serializers.CharField(source='profile.major', read_only=True)
+    admission_year = serializers.IntegerField(source='profile.admission_year', read_only=True)
     clubs_as_admin = ClubListSerializer(many=True, source='club_admin')
     clubs_as_members = ClubListSerializer(many=True, source='club_members')
     class Meta:
@@ -44,6 +46,7 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
 
 class EventListSerializer(serializers.HyperlinkedModelSerializer):
+    club = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Event
         fields = ('id', 'name', 'content', 'date', 'club',)
