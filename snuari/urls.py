@@ -28,6 +28,9 @@ urlpatterns = [
     url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view(), name='club_join'),
     url(r'^signup/$', views.SignupView.as_view(), name='signup'),
     url(r'^verify/$', views.VerifyView.as_view(), name='verify'),
-    url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^board/$', views.BoardListView.as_view(), name='board_list'),
+    url(r'^board/(?P<pk>[0-9]+)/$', views.BoardDetailView.as_view(), name='board_detail'),
+    url(r'^article/$', views.ArticleListView.as_view(), name='board_list'),
+    url(r'^article/(?P<pk>[0-9]+)/$', views.ArticleDetailView.as_view(), name='board_detail'),
+    url(r'^api-auth/', include('rest_framework.urls')),
 ]

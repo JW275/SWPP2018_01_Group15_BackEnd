@@ -1,12 +1,22 @@
 from rest_framework import serializers
 from snuariapi.models import *
 
+class UserSimpleSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username',)
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     clubs_as_admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_admin')
     clubs_as_members = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_members')
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'clubs_as_admin', 'clubs_as_members',)
+
+class BoardListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Board
+        fields = ('id', 'name',)
 
 class ClubListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -17,7 +27,7 @@ class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='boards')
+    boards = BoardListSerializer(many=True, read_only=True, source='board_club')
     class Meta:
         model = Club
         fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction','boards',)
@@ -44,7 +54,16 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
 
-class BoardListSerializer(serializers.HyperlinkedModelSerializer):
+class ArticleSerializer(serializers.HyperlinkedModelSerializer):
+    writer = UserSimpleSerializer(read_only=True)
+    board = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Article
+        fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'writer', 'board',)
+
+class BoardDetailSerializer(serializers.HyperlinkedModelSerializer):
+    articles = ArticleSerializer(many=True, source='article_board')
     class Meta:
         model = Board
-        fields = ('id', 'name', 'club',)
+        fields = ('id', 'name', 'articles',)
+

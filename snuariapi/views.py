@@ -149,10 +149,83 @@ class BoardListView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        if request.user.is_anonymous: # if not a valid user
-            return Response('user', status=400)
+        club_id = request.data.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club does not exist', status=400)
+
         serializer = BoardListSerializer(data=request.data)
         if serializer.is_valid():
             board = serializer.save()
+            board.club = club
+            board.save()
             return Response({'id':board.id})
         return Response('', status=400) # Something Wrong
+
+class BoardDetailView(APIView):
+    def get(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        serializer = BoardDetailSerializer(board)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        serializer = BoardDetailSerializer(board, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        board.delete()
+        return Response('')
+
+class ArticleListView(APIView):
+    def get(self, request):
+        article = Article.objects.all()
+        serializer = ArticleSerializer(article, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        board_id = request.data.get('board_id', None)
+        if board_id is None:
+            return Response('board id is required', status=400)
+
+        board = Board.objects.filter(id=board_id).first()
+        if board is None:
+            return Response('board does not exist', status=400)
+
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid():
+            article = serializer.save()
+            article.writer = request.user
+            article.board = board
+            article.save()
+            return Response({'id':article.id})
+        return Response('', status=400) # Something Wrong
+
+class ArticleDetailView(APIView):
+    def get(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid():
+            article = serializer.save()
+            article.updated_at = datetime.datetime.now()
+            article.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        article.delete()
+        return Response('')
+
