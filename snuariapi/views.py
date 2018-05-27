@@ -147,7 +147,7 @@ class BoardListView(APIView):
     def get(self, request):
         board = Board.objects.all()
         serializer = BoardListSerializer(board, many=True)
-         return Response(serializer.data)
+        return Response(serializer.data)
 
     def post(self, request):
         club_id = request.data.get('club_id', None)
