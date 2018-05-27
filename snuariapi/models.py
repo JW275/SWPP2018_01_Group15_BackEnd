@@ -44,6 +44,6 @@ class Accounting(models.Model):
     club = models.ForeignKey(Club, models.CASCADE, related_name='club_accounting', null=True)
     is_income = models.BooleanField()
     money = models.IntegerField()
-    date = models.DateTimeField()
+    date = models.DateField()
     writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer', null=True)
     content = models.TextField()
