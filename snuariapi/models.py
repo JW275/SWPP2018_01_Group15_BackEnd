@@ -37,6 +37,18 @@ class Club(models.Model):
     scope = models.CharField(max_length=20)
     category = models.CharField(max_length=20)
     introduction = models.TextField()
+    
+class Board(models.Model):
+    name = models.CharField(max_length=20)
+    club = models.ForeignKey(Club, related_name='board_club', on_delete=models.CASCADE, null=True)
+
+class Article(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    writer = models.ForeignKey(User, models.CASCADE, related_name='article_writer', null=True)
+    board = models.ForeignKey(Board, models.CASCADE, related_name='article_board', null=True)
+    title = models.CharField(max_length=40)
+    content = models.TextField()
 
 class Accounting(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
