@@ -129,3 +129,5 @@ REST_FRAMEWORK = {
         'snuariapi.auth.CookieAuthentication',
     )
 }
+
+

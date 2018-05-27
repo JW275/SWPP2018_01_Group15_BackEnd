@@ -153,6 +153,7 @@ class BoardListView(APIView):
             return Response('user', status=400)
         serializer = BoardListSerializer(data=request.data)
         if serializer.is_valid():
+            print(serializer)
             board = serializer.save()
             return Response({'id':board.id})
         return Response('', status=400) # Something Wrong
