@@ -53,7 +53,7 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
-
+        
 class ArticleSerializer(serializers.HyperlinkedModelSerializer):
     writer = UserSimpleSerializer(read_only=True)
     board = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -67,3 +67,8 @@ class BoardDetailSerializer(serializers.HyperlinkedModelSerializer):
         model = Board
         fields = ('id', 'name', 'articles',)
 
+class AccountingSerializer(serializers.HyperlinkedModelSerializer):
+    writer = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Accounting
+        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content',)

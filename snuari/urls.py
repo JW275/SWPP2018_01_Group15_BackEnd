@@ -32,5 +32,8 @@ urlpatterns = [
     url(r'^board/(?P<pk>[0-9]+)/$', views.BoardDetailView.as_view(), name='board_detail'),
     url(r'^article/$', views.ArticleListView.as_view(), name='board_list'),
     url(r'^article/(?P<pk>[0-9]+)/$', views.ArticleDetailView.as_view(), name='board_detail'),
+    url(r'^account/$', views.AccountingListView.as_view()),
+    url(r'^account/(?P<pk>[0-9]+)/$', views.AccountingDetailView.as_view()),
+    url(r'^account/statistic/(?P<pk>[0-9]+)/$', views.AccountingStatisticView.as_view()),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]
