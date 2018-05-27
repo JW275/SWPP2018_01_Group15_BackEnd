@@ -13,8 +13,10 @@ from snuariapi.services import *
 from config import domain
 
 from datetime import datetime
+import pytz
 
-now = datetime.now()
+utc = pytz.UTC
+now = datetime.now().replace(tzinfo=utc)
 
 class LoginView(APIView):
     def post(self, request):
@@ -155,9 +157,9 @@ class EventListView(APIView):
         if time == None:
             events = Event.objects.filter(club = clubid)
         elif time == 'future':
-            events = Event.objects.filter(club = clubid).filter(date >= now)
+            events = Event.objects.filter(club = clubid).filter(date__gte = (now))
         elif time == 'past':
-            events = Event.objects.filter(club = clubid).filter(date < now)
+            events = Event.objects.filter(club = clubid).filter(date__lte = (now))
         else:
             return Response('', status=400)
         serializer = EventListSerializer(events, many=True)
@@ -166,15 +168,23 @@ class EventListView(APIView):
     def post(self, request):
         if request.user.is_anonymous:
             return Response('user', status=400)
+        club_id = request.data.get('club', None)
+        club = Club.objects.get(pk=club_id)
+        if club is None:
+            return Response('club id is required', status=400)
         serializer = EventListSerializer(data=request.data)
         if serializer.is_valid():
             event = serializer.save()
+            event.club = club
+            event.save()
             time = None
-            if event.date >= now:
+            event_date = event.date
+            if event_date >= now:
                 time = 'future'
             else:
                 time = 'past'
-            return Response({'event': event, 'time': time})   #is this right?
+            serializer = EventListSerializer(event)
+            return Response({'event': serializer.data, 'time': time})   #is this right?
         return Response('', status=400)
 
 class EventDetailView(APIView):
