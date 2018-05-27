@@ -1,0 +1,15 @@
+language: python
+
+python:
+    - 3.6
+
+install: 
+    - pip install -r requirements
+
+before_script:
+    - cp config.sample.py config.py
+    - python manage.py makemigrations snuariapi
+    - python manage.py migrate
+
+script:
+    - python manage.py test
