@@ -42,3 +42,9 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
+
+class AccountingSerializer(serializers.HyperlinkedModelSerializer):
+    writer = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Accounting
+        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content',)

@@ -11,6 +11,7 @@ from snuariapi.serializers import *
 from snuariapi.services import *
 
 from config import domain
+import datetime
 
 class LoginView(APIView):
     def post(self, request):
@@ -141,3 +142,83 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class AccountingListView(APIView):
+    def get(self, request):
+        club_id = request.GET.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        account = club.club_accounting.all()
+        serializer = AccountingSerializer(account, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        club_id = request.data.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        serializer = AccountingSerializer(data=request.data)
+        if serializer.is_valid():
+            account = serializer.save()
+            account.writer = request.user
+            account.club = club
+            account.save()
+            return Response({"id": account.id})
+        return Response(serializer.errors, status=400)
+
+class AccountingDetailView(APIView):
+    def get(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        serializer = AccountingSerializer(account)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        serializer = AccountingSerializer(account, data=request.data, partial=True)
+        if serializer.is_valid():
+            account = serializer.save()
+            account.updated_at = datetime.datetime.now()
+            account.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        account.delete()
+        return Response('')
+        
+class AccountingStatisticView(APIView):
+    def get(self, request, pk=None):
+        club = Club.objects.filter(pk=pk).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        account = club.club_accounting.all()
+
+        start_from = request.GET.get('start_from', '1990-01-01')
+        end_until = request.GET.get('end_until', datetime.datetime.now().strftime('%Y-%m-%d'))
+        account = account.filter(date__range=(start_from, end_until))
+
+        only = request.GET.get('only', 'all')
+        if only == 'all':
+            pass
+        elif only == 'income':
+            account = account.filter(is_income=True)
+        elif only == 'outgo':
+            account = account.filter(is_income=False)
+
+        serializer = AccountingSerializer(account, many=True)
+        total = 0
+        for ac in account:
+            if ac.is_income:
+                total += ac.money
+            else:
+                total -= ac.money
+
+        return Response({'total': total, 'accountings': serializer.data})
+
+
