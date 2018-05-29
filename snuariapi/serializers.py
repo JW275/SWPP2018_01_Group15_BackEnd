@@ -52,6 +52,7 @@ class EventListSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'name', 'content', 'date', 'club',)
 
 class EventDetailSerializer(serializers.HyperlinkedModelSerializer):
+    club = serializers.PrimaryKeyRelatedField(read_only=True)
     future_attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     future_absentees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     past_attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
