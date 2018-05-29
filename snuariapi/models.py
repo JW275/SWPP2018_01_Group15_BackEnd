@@ -42,7 +42,6 @@ class Board(models.Model):
     name = models.CharField(max_length=20)
     club = models.ForeignKey(Club, related_name='boards', on_delete=models.CASCADE)
 
-
 class Event(models.Model):
     name = models.CharField(max_length=20)
     content = models.TextField()
