@@ -190,7 +190,7 @@ class EventListView(APIView):
 class EventDetailView(APIView):
     def get(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        serializer = EventDetailSerializer(event)
+        serializer = EventDetailSerializer(event, context={'request': request})
         return Response(serializer.data)
 
     def put(self, request, pk=None):
@@ -205,3 +205,22 @@ class EventDetailView(APIView):
         event = Event.objects.get(pk=pk)
         event.delete()
         return Response('')
+
+class EventFutureAttendeeView(APIView):
+    def put(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        print(event)
+        serializer = EventDetailSerializer(event)
+        print(serializer)
+        # serializer = EventDetailSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer.future_attendees += request.user
+            serializer.save()
+            return Response(request.user)
+        return Response('', status=400)
+
+# class EventFutureAbsenteeView(APIView):
+
+
+# class EventPastAttendeeView(APIView):
