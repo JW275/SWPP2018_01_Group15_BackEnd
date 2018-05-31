@@ -268,6 +268,18 @@ class AccountingStatisticView(APIView):
             return Response('club is not exist', status=400)
         account = club.club_accounting.all()
 
+        start_from = request.GET.get('start_from', '1990-01-01')
+        end_until = request.GET.get('end_until', datetime.datetime.now().strftime('%Y-%m-%d'))
+        account = account.filter(date__range=(start_from, end_until))
+
+        only = request.GET.get('only', 'all')
+        if only == 'all':
+            pass
+        elif only == 'income':
+            account = account.filter(is_income=True)
+        elif only == 'outgo':
+            account = account.filter(is_income=False)
+
         serializer = AccountingSerializer(account, many=True)
         total = 0
         for ac in account:
