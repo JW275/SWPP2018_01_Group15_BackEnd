@@ -17,9 +17,12 @@ class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    accounts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Club
-        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction',)
+        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction', 'boards', 'events', 'accounts', )
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -45,6 +48,21 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
 
 class AccountingSerializer(serializers.HyperlinkedModelSerializer):
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
+    club = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Accounting
-        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content',)
+        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content', 'club',)
+
+class EventListSerializer(serializers.HyperlinkedModelSerializer):
+    club = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'content', 'date', 'club',)
+
+class EventDetailSerializer(serializers.HyperlinkedModelSerializer):
+    future_attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    future_absentees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    past_attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'content', 'date', 'club', 'future_attendees', 'future_absentees', 'past_attendees', )

@@ -32,4 +32,6 @@ urlpatterns = [
     url(r'^account/$', views.AccountingListView.as_view()),
     url(r'^account/(?P<pk>[0-9]+)/$', views.AccountingDetailView.as_view()),
     url(r'^account/statistic/(?P<pk>[0-9]+)/$', views.AccountingStatisticView.as_view()),
+    url(r'^event/$', views.EventListView.as_view(), name='event_list'),
+    url(r'^event/(?P<pk>[0-9]+)/$', views.EventDetailView.as_view(), name='event_detail'),
 ]

@@ -41,9 +41,25 @@ class Club(models.Model):
 class Accounting(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
-    club = models.ForeignKey(Club, models.CASCADE, related_name='club_accounting', null=True)
-    is_income = models.BooleanField()
+    club = models.ForeignKey(Club, on_delete=models.CASCADE, related_name='accounts', null=True)
+    # is_income = models.BooleanField()
+    is_income = models.TextField()
     money = models.IntegerField()
     date = models.DateTimeField()
-    writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer', null=True)
+    writer = models.ForeignKey(User, models.CASCADE, related_name='writer', null=True)
     content = models.TextField()
+
+class Board(models.Model):
+    name = models.CharField(max_length=20)
+    club = models.ForeignKey(Club, related_name='boards', on_delete=models.CASCADE)
+
+class Event(models.Model):
+    name = models.CharField(max_length=20)
+    content = models.TextField()
+    date = models.DateTimeField()
+    club = models.ForeignKey(Club, related_name='events', on_delete=models.CASCADE, null=True)
+    # planning to go / not go (future event)
+    future_attendees = models.ManyToManyField(User, related_name='future_attend_events')
+    future_absentees = models.ManyToManyField(User, related_name='future_absent_events')
+    # have attended (past event)
+    past_attendees = models.ManyToManyField(User, related_name='past_attend_events')

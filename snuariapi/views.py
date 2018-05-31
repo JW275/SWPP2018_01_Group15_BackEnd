@@ -13,6 +13,13 @@ from snuariapi.services import *
 from config import domain
 import datetime
 
+from datetime import datetime
+import pytz
+
+utc = pytz.UTC
+now = datetime.now().replace(tzinfo=utc)
+
+
 class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username', None)
@@ -145,30 +152,41 @@ class VerifyView(APIView):
 
 class AccountingListView(APIView):
     def get(self, request):
-        club_id = request.GET.get('club_id', None)
+        club_id = request.GET.get('club', None)
         if club_id is None:
             return Response('club id is required', status=400)
         club = Club.objects.filter(id=club_id).first()
         if club is None:
             return Response('club is not exist', status=400)
-        account = club.club_accounting.all()
+        account = club.accounts.all()
         serializer = AccountingSerializer(account, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        club_id = request.data.get('club_id', None)
+        club_id = request.data.get('club', None)
+        print(club_id)
         if club_id is None:
             return Response('club id is required', status=400)
         club = Club.objects.filter(id=club_id).first()
         if club is None:
             return Response('club is not exist', status=400)
+        
         serializer = AccountingSerializer(data=request.data)
         if serializer.is_valid():
+            print (request.data)
+            print("valid se")
             account = serializer.save()
+            print(account)
             account.writer = request.user
+            print(account.writer)
             account.club = club
+            print(account.club)
+            print("money")
+            print(account)
             account.save()
-            return Response({"id": account.id})
+            print(account)
+            # return Response({"id": account.id}) 
+            return Response({'account': serializer.data})
         return Response(serializer.errors, status=400)
 
 class AccountingDetailView(APIView):
@@ -184,12 +202,63 @@ class AccountingDetailView(APIView):
             account = serializer.save()
             account.updated_at = datetime.datetime.now()
             account.save()
+
+class EventListView(APIView):
+    def get(self, request):
+        time = request.GET.get('need', None)
+        clubid = request.GET.get('clubid', None)
+        if clubid == None:
+            return Response('', status=400)
+        if time == None:
+            events = Event.objects.filter(club = clubid)
+        elif time == 'future':
+            events = Event.objects.filter(club = clubid).filter(date__gte = (now))
+        elif time == 'past':
+            events = Event.objects.filter(club = clubid).filter(date__lte = (now))
+        else:
+            return Response('', status=400)
+        serializer = EventListSerializer(events, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if request.user.is_anonymous:
+            return Response('user', status=400)
+        club_id = request.data.get('club', None)
+        club = Club.objects.get(pk=club_id)
+        if club is None:
+            return Response('club id is required', status=400)
+        serializer = EventListSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            event.club = club
+            event.save()
+            time = None
+            event_date = event.date
+            if event_date >= now:
+                time = 'future'
+            else:
+                time = 'past'
+            serializer = EventListSerializer(event)
+            return Response({'event': serializer.data, 'time': time})   #is this right?
+        return Response('', status=400)
+
+class EventDetailView(APIView):
+    def get(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
             return Response('')
         return Response('', status=400)
 
     def delete(self, request, pk=None):
-        account = Accounting.objects.get(pk=pk)
-        account.delete()
+        event = Event.objects.get(pk=pk)
+        event.delete()
         return Response('')
         
 class AccountingStatisticView(APIView):
@@ -210,3 +279,6 @@ class AccountingStatisticView(APIView):
         return Response({'total': total, 'accountings': serializer.data})
 
 
+        event = Event.objects.get(pk=pk)
+        event.delete()
+        return Response('')
