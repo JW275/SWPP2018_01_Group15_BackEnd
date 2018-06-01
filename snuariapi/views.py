@@ -212,13 +212,19 @@ class EventFutureAttendeeView(APIView):
         event.future_attendees.add(request.user)
         event.future_absentees.remove(rquest.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.future_attendees.remove(rquest.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
 class EventFutureAbsenteeView(APIView):
     def post(self, request, pk=None):
@@ -226,23 +232,35 @@ class EventFutureAbsenteeView(APIView):
         event.future_absentees.add(request.user)
         event.future_attendees.remove(rquest.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.future_absentees.remove(rquest.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
 class EventPastAttendeeView(APIView):
     def post(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.past_attendees.add(request.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.past_attendees.remove(rquest.user)
         event.save()
-        return Response('')
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
