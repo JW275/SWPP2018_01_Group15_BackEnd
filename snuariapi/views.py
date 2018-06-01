@@ -210,7 +210,7 @@ class EventFutureAttendeeView(APIView):
     def post(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.future_attendees.add(request.user)
-        event.future_absentees.remove(rquest.user)
+        event.future_absentees.remove(request.user)
         event.save()
         return Response({
             'id': request.user.id,
@@ -219,7 +219,7 @@ class EventFutureAttendeeView(APIView):
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.future_attendees.remove(rquest.user)
+        event.future_attendees.remove(request.user)
         event.save()
         return Response({
             'id': request.user.id,
@@ -230,7 +230,7 @@ class EventFutureAbsenteeView(APIView):
     def post(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.future_absentees.add(request.user)
-        event.future_attendees.remove(rquest.user)
+        event.future_attendees.remove(request.user)
         event.save()
         return Response({
             'id': request.user.id,
@@ -239,7 +239,7 @@ class EventFutureAbsenteeView(APIView):
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.future_absentees.remove(rquest.user)
+        event.future_absentees.remove(request.user)
         event.save()
         return Response({
             'id': request.user.id,
@@ -264,3 +264,20 @@ class EventPastAttendeeView(APIView):
             'id': request.user.id,
             'username': request.user.username
         })
+
+class EventStatisticView(APIView):
+    def get(self, request, pk=None):
+        event = Event.objects.filter(club=pk)
+        user_id = request.GET.get('user', None)
+        user = User.objects.filter(id=user_id).first()
+        if user is None:
+            return Response('Invalid user id', status=400)
+        # calculate absent count
+        plan = event.filter(future_attendees=user)
+        real = plan.filter(past_attendees=user)
+        absent_count = len(plan) - len(real)
+        # calculate attendence rate
+        final = event.filter(past_attendees=user)
+        attendence_rate = len(final) / len(event)
+        return Response({'attendence_rate': attendence_rate, 'absent_count': absent_count})
+
