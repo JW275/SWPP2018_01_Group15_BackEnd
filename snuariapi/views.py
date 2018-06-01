@@ -207,20 +207,42 @@ class EventDetailView(APIView):
         return Response('')
 
 class EventFutureAttendeeView(APIView):
-    def put(self, request, pk=None):
+    def post(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        print(event)
-        serializer = EventDetailSerializer(event)
-        print(serializer)
-        # serializer = EventDetailSerializer(event, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer.future_attendees += request.user
-            serializer.save()
-            return Response(request.user)
-        return Response('', status=400)
+        event.future_attendees.add(request.user)
+        event.future_absentees.remove(rquest.user)
+        event.save()
+        return Response('')
 
-# class EventFutureAbsenteeView(APIView):
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_attendees.remove(rquest.user)
+        event.save()
+        return Response('')
 
+class EventFutureAbsenteeView(APIView):
+    def post(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_absentees.add(request.user)
+        event.future_attendees.remove(rquest.user)
+        event.save()
+        return Response('')
 
-# class EventPastAttendeeView(APIView):
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_absentees.remove(rquest.user)
+        event.save()
+        return Response('')
+
+class EventPastAttendeeView(APIView):
+    def post(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.past_attendees.add(request.user)
+        event.save()
+        return Response('')
+
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.past_attendees.remove(rquest.user)
+        event.save()
+        return Response('')
