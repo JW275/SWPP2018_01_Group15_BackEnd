@@ -258,7 +258,7 @@ class EventPastAttendeeView(APIView):
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.past_attendees.remove(rquest.user)
+        event.past_attendees.remove(request.user)
         event.save()
         return Response({
             'id': request.user.id,
