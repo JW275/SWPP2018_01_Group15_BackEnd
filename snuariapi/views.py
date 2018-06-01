@@ -208,15 +208,17 @@ class EventDetailView(APIView):
 
 class EventFutureAttendeeView(APIView):
     def post(self, request, pk=None):
+        if request.user.is_anonymous:
+            return Response('user', status=400)
         event = Event.objects.get(pk=pk)
         event.future_attendees.add(request.user)
-        event.future_absentees.remove(rquest.user)
+        event.future_absentees.remove(request.user)
         event.save()
-        return Response('')
+        return Response({'id': request.user.id, 'username':request.user.username})
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.future_attendees.remove(rquest.user)
+        event.future_attendees.remove(request.user)
         event.save()
         return Response('')
 
@@ -224,13 +226,13 @@ class EventFutureAbsenteeView(APIView):
     def post(self, request, pk=None):
         event = Event.objects.get(pk=pk)
         event.future_absentees.add(request.user)
-        event.future_attendees.remove(rquest.user)
+        event.future_attendees.remove(request.user)
         event.save()
-        return Response('')
+        return Response({'id': request.user.id, 'username':request.user.username})
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.future_absentees.remove(rquest.user)
+        event.future_absentees.remove(request.user)
         event.save()
         return Response('')
 
@@ -243,6 +245,6 @@ class EventPastAttendeeView(APIView):
 
     def delete(self, request, pk=None):
         event = Event.objects.get(pk=pk)
-        event.past_attendees.remove(rquest.user)
+        event.past_attendees.remove(request.user)
         event.save()
         return Response('')
