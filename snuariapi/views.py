@@ -64,6 +64,7 @@ class ClubListView(APIView):
         if serializer.is_valid():
             club = serializer.save()
             club.admin.add(request.user)
+            club.members.add(request.user)
             return Response({'id':club.id})
         return Response('', status=400) # Something Wrong
 
@@ -254,11 +255,11 @@ class EventPastAttendeeView(APIView):
         event = Event.objects.get(pk=pk)
         event.past_attendees.clear()
         for attendee in past_attendees:
-            addme = User.objects.get(pk=attendee.id)
+            addme = User.objects.get(pk=attendee['id'])
             event.past_attendees.add(addme)
-            
+            event.save
         event.save()
-        return Response('')
+        return Response({'clubid': event.club.id })
 
     # def delete(self, request, pk=None):
     #     event = Event.objects.get(pk=pk)
