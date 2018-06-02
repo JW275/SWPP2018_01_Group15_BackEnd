@@ -13,10 +13,15 @@ class ClubListSerializer(serializers.HyperlinkedModelSerializer):
         model = Club
         fields = ('id', 'name', 'scope', 'category', 'introduction',)
 
+class AttendanceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username',)
+        
 class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
-    admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    admin = AttendanceSerializer(many=True, read_only=True)
+    members = AttendanceSerializer(many=True, read_only=True)
+    waitings = AttendanceSerializer(many=True, read_only=True)
     boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
