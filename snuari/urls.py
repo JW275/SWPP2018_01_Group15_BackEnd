@@ -34,5 +34,6 @@ urlpatterns = [
     url(r'^event/(?P<pk>[0-9]+)/future_attendee/$', views.EventFutureAttendeeView.as_view(), name='event_future_attendee'),
     url(r'^event/(?P<pk>[0-9]+)/future_absentee/$', views.EventFutureAbsenteeView.as_view(), name='event_future_absentee'),
     url(r'^event/(?P<pk>[0-9]+)/past_attendee/$', views.EventPastAttendeeView.as_view(), name='event_past_attendee'),
+    url(r'^event/(?P<pk>[0-9]+)/analysis/$', views.EventStatisticView.as_view(), name='event_past_attendee'),
 
 ]
