@@ -191,17 +191,25 @@ class AccountingListView(APIView):
 
 class AccountingDetailView(APIView):
     def get(self, request, pk=None):
+        
         account = Accounting.objects.get(pk=pk)
         serializer = AccountingSerializer(account)
+        print(serializer.data)
         return Response(serializer.data)
 
     def put(self, request, pk=None):
+        
         account = Accounting.objects.get(pk=pk)
         serializer = AccountingSerializer(account, data=request.data, partial=True)
         if serializer.is_valid():
             account = serializer.save()
             account.updated_at = datetime.datetime.now()
             account.save()
+
+    def delete(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        account.delete()
+        return Response('')
 
 class EventListView(APIView):
     def get(self, request):
@@ -241,6 +249,7 @@ class EventListView(APIView):
             serializer = EventListSerializer(event)
             return Response({'event': serializer.data, 'time': time})   #is this right?
         return Response('', status=400)
+
 
 class EventDetailView(APIView):
     def get(self, request, pk=None):

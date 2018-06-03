@@ -12,6 +12,13 @@ class ClubListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Club
         fields = ('id', 'name', 'scope', 'category', 'introduction',)
+        
+class AccountingSerializer(serializers.HyperlinkedModelSerializer):
+    writer = serializers.PrimaryKeyRelatedField(read_only=True)
+    club = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Accounting
+        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content', 'club',)
 
 class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -19,7 +26,7 @@ class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     boards = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    accounts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    accounts = AccountingSerializer(many=True, read_only=True)
     class Meta:
         model = Club
         fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction', 'boards', 'events', 'accounts', )
@@ -46,12 +53,6 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
 
-class AccountingSerializer(serializers.HyperlinkedModelSerializer):
-    writer = serializers.PrimaryKeyRelatedField(read_only=True)
-    club = serializers.PrimaryKeyRelatedField(read_only=True)
-    class Meta:
-        model = Accounting
-        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content', 'club',)
 
 class EventListSerializer(serializers.HyperlinkedModelSerializer):
     club = serializers.PrimaryKeyRelatedField(read_only=True)
