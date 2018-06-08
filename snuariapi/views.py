@@ -94,6 +94,55 @@ class ClubJoinView(APIView):
         club.waitings.remove(request.user)
         return Response('')
 
+class ClubMemberView(APIView):
+    def put(self, request, club_id=None, uid=None):
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club id is wrong', status=400)
+
+        user = club.waitings.filter(id=uid).first()
+        if user is not None:
+            club.waitings.remove(user)
+            club.waitings.add(user)
+            club.save()
+            return Response('')
+        
+        user = club.admin.filter(id=uid).first()
+        if user is not None:
+            club.admin.remove(user)
+            club.save()
+            return Response('')
+
+        user = club.members.filter(id=uid).first()
+        if user is not None:
+            club.admin.add(user)
+            club.save()
+            return Response('')
+        
+        return Response('Wrong user id', status=400)
+
+    def delete(self, request, club_id=None, uid=None):
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club id is wrong', status=400)
+
+        user = club.members.filter(id=uid).first()
+        if user is not None:
+            club.members.remove(user)
+            user = club.admin.filter(id=uid).first()
+            if user is not None:
+                club.admin.remove(user)
+            club.save()
+            return Response('')
+
+        user = club.waitings.filter(id=uid).first()
+        if user is not None:
+            club.waitings.remove(user)
+            club.save()
+            return Response('')
+
+        return Response('user not exists', status=400)
+
 class SignupView(APIView):
     def post(self, request):
         password = request.data.get('password', None)
