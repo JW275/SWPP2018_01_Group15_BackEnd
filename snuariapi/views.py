@@ -145,7 +145,15 @@ class VerifyView(APIView):
    
 class BoardListView(APIView):
     def get(self, request):
-        board = Board.objects.all()
+        club_id = request.GET.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club does not exist', status=400)
+
+        board = club.board_club.all()
         serializer = BoardListSerializer(board, many=True)
         return Response(serializer.data)
 
@@ -187,7 +195,15 @@ class BoardDetailView(APIView):
 
 class ArticleListView(APIView):
     def get(self, request):
-        article = Article.objects.all()
+        board_id = request.GET.get('board_id', None)
+        if board_id is None:
+            return Response('board id is required', status=400)
+
+        board = Board.objects.filter(id=board_id).first()
+        if board is None:
+            return Response('board does not exist', status=400)
+
+        article = board.article_board.all()
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data)
 
@@ -309,3 +325,54 @@ class AccountingStatisticView(APIView):
 
         return Response({'total': total, 'accountings': serializer.data})
 
+class CommentListView(APIView):
+    def get(self, request):
+        article_id = request.GET.get('article_id', None)
+        if article_id is None:
+            return Response('article id is required', status=400)
+        article = Article.objects.filter(id=article_id).first()
+        if article is None:
+            return Response('article is not exist', status=400)
+        comment = article.comment_article.all()
+        serializer = CommentSerializer(comment, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        article_id = request.data.get('article_id', None)
+        if article_id is None:
+            return Response('article id is required', status=400)
+
+        article = Article.objects.filter(id=article_id).first()
+        if article is None:
+            return Response('article does not exist', status=400)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            comment = serializer.save()
+            comment.writer = request.user
+            comment.article = article
+            comment.save()
+            return Response({'id':comment.id})
+        return Response('', status=400) # Something Wrong
+
+class CommentDetailView(APIView):
+    def get(self, request, pk=None):
+        comment = Comment.objects.get(pk=pk)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        comment = Comment.objects.get(pk=pk)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            comment = serializer.save()
+            comment.updated_at = datetime.datetime.now()
+            comment.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        comment = Comment.objects.get(pk=pk)
+        comment.delete()
+        return Response('')
+      

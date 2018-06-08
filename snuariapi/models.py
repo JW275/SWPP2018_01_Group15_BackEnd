@@ -59,3 +59,11 @@ class Accounting(models.Model):
     date = models.DateField()
     writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer', null=True)
     content = models.TextField()
+
+class Comment(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    article = models.ForeignKey(Article, models.CASCADE, related_name='comment_article', null=True)
+    writer = models.ForeignKey(User, models.CASCADE, related_name='comment_writer', null=True)
+    title = models.TextField()
+    content = models.TextField()
