@@ -13,6 +13,12 @@ from snuariapi.services import *
 from config import domain
 import datetime
 
+from datetime import datetime
+import pytz
+
+utc = pytz.UTC
+now = datetime.now().replace(tzinfo=utc)
+
 class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username', None)
@@ -59,6 +65,7 @@ class ClubListView(APIView):
         if serializer.is_valid():
             club = serializer.save()
             club.admin.add(request.user)
+            club.members.add(request.user)
             return Response({'id':club.id})
         return Response('', status=400) # Something Wrong
 
@@ -191,6 +198,64 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class EventListView(APIView):
+    def get(self, request):
+        time = request.GET.get('need', None)
+        clubid = request.GET.get('clubid', None)
+        if clubid == None:
+            return Response('', status=400)
+        if time == None:
+            events = Event.objects.filter(club = clubid)
+        elif time == 'future':
+            events = Event.objects.filter(club = clubid).filter(date__gte = (now))
+        elif time == 'past':
+            events = Event.objects.filter(club = clubid).filter(date__lte = (now))
+        else:
+            return Response('', status=400)
+        serializer = EventListSerializer(events, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if request.user.is_anonymous:
+            return Response('user', status=400)
+        club_id = request.data.get('club', None)
+        club = Club.objects.get(pk=club_id)
+        if club is None:
+            return Response('club id is required', status=400)
+        serializer = EventListSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            event.club = club
+            event.save()
+            time = None
+            event_date = event.date
+            if event_date >= now:
+                time = 'future'
+            else:
+                time = 'past'
+            serializer = EventListSerializer(event)
+            return Response({'event': serializer.data, 'time': time})   #is this right?
+        return Response('', status=400)
+
+class EventDetailView(APIView):
+    def get(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event, context={'request': request})
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        serializer = EventDetailSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.delete()
+        return Response('')
    
 class BoardListView(APIView):
     def get(self, request):
@@ -241,6 +306,85 @@ class BoardDetailView(APIView):
         board = Board.objects.get(pk=pk)
         board.delete()
         return Response('')
+
+class EventFutureAttendeeView(APIView):
+    def post(self, request, pk=None):
+        if request.user.is_anonymous:
+            return Response('user', status=400)
+        event = Event.objects.get(pk=pk)
+        event.future_attendees.add(request.user)
+        event.future_absentees.remove(request.user)
+        event.save()
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
+
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_attendees.remove(request.user)
+        event.save()
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
+
+class EventFutureAbsenteeView(APIView):
+    def post(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_absentees.add(request.user)
+        event.future_attendees.remove(request.user)
+        event.save()
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
+
+    def delete(self, request, pk=None):
+        event = Event.objects.get(pk=pk)
+        event.future_absentees.remove(request.user)
+        event.save()
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
+
+class EventPastAttendeeView(APIView):
+    def post(self, request, pk=None):
+        past_attendees = request.data.get('past_attendees', None)   # array containing id & usernames
+        event = Event.objects.get(pk=pk)
+        event.past_attendees.clear()
+        for attendee in past_attendees:
+            addme = User.objects.get(pk=attendee['id'])
+            event.past_attendees.add(addme)
+            event.save
+        event.save()
+        return Response({'clubid': event.club.id })
+
+    # def delete(self, request, pk=None):
+    #     event = Event.objects.get(pk=pk)
+    #     event.past_attendees.remove(request.user)
+    #     event.save()
+    #     return Response({
+    #         'id': request.user.id,
+    #         'username': request.user.username
+    #     })
+
+class EventStatisticView(APIView):
+    def get(self, request, pk=None):
+        event = Event.objects.filter(club=pk)
+        user_id = request.GET.get('user', None)
+        user = User.objects.filter(id=user_id).first()
+        if user is None:
+            return Response('Invalid user id', status=400)
+        # calculate absent count
+        plan = event.filter(future_attendees=user)
+        real = plan.filter(past_attendees=user)
+        absent_count = len(plan) - len(real)
+        # calculate attendence rate
+        final = event.filter(past_attendees=user)
+        attendence_rate = len(final) / len(event)
+        return Response({'attendence_rate': attendence_rate, 'absent_count': absent_count})
 
 class ArticleListView(APIView):
     def get(self, request):

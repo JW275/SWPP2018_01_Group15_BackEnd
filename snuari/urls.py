@@ -38,5 +38,13 @@ urlpatterns = [
     url(r'^account/$', views.AccountingListView.as_view()),
     url(r'^account/(?P<pk>[0-9]+)/$', views.AccountingDetailView.as_view()),
     url(r'^account/statistic/(?P<pk>[0-9]+)/$', views.AccountingStatisticView.as_view()),
+    url(r'^signup/$', views.SignupView.as_view()),
+    url(r'^verify/$', views.VerifyView.as_view()),
+    url(r'^event/$', views.EventListView.as_view(), name='event_list'),
+    url(r'^event/(?P<pk>[0-9]+)/$', views.EventDetailView.as_view(), name='event_detail'),
+    url(r'^event/(?P<pk>[0-9]+)/future_attendee/$', views.EventFutureAttendeeView.as_view(), name='event_future_attendee'),
+    url(r'^event/(?P<pk>[0-9]+)/future_absentee/$', views.EventFutureAbsenteeView.as_view(), name='event_future_absentee'),
+    url(r'^event/(?P<pk>[0-9]+)/past_attendee/$', views.EventPastAttendeeView.as_view(), name='event_past_attendee'),
+    url(r'^event/(?P<pk>[0-9]+)/analysis/$', views.EventStatisticView.as_view(), name='event_past_attendee'),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]
