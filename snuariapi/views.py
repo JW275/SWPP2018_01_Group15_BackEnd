@@ -354,10 +354,10 @@ class EventPastAttendeeView(APIView):
         past_attendees = request.data.get('past_attendees', None)   # array containing id & usernames
         event = Event.objects.get(pk=pk)
         event.past_attendees.clear()
+        print(past_attendees)
         for attendee in past_attendees:
             addme = User.objects.get(pk=attendee['id'])
             event.past_attendees.add(addme)
-            event.save
         event.save()
         return Response({'clubid': event.club.id })
 
