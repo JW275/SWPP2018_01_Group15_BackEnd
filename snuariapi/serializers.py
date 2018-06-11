@@ -55,6 +55,7 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
 
+
 class EventListSerializer(serializers.HyperlinkedModelSerializer):
     club = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
@@ -69,8 +70,23 @@ class EventDetailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'content', 'date', 'club', 'future_attendees', 'future_absentees', 'past_attendees', )
+
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    writer = UserSimpleSerializer(read_only=True)
+    article = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'writer', 'article',)
         
 class ArticleSerializer(serializers.HyperlinkedModelSerializer):
+    writer = UserSimpleSerializer(read_only=True)
+    board = serializers.PrimaryKeyRelatedField(read_only=True)
+    comment = CommentSerializer(read_only=True, many=True, source='comment_article')
+    class Meta:
+        model = Article
+        fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'writer', 'board', 'comment',)
+
+class ArticleSimpleSerializer(serializers.HyperlinkedModelSerializer):
     writer = UserSimpleSerializer(read_only=True)
     board = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
@@ -78,7 +94,7 @@ class ArticleSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'title', 'content', 'created_at', 'updated_at', 'writer', 'board',)
 
 class BoardDetailSerializer(serializers.HyperlinkedModelSerializer):
-    articles = ArticleSerializer(many=True, source='article_board')
+    articles = ArticleSimpleSerializer(read_only=True, many=True, source='article_board')
     class Meta:
         model = Board
         fields = ('id', 'name', 'articles',)
