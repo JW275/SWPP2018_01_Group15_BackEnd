@@ -11,6 +11,7 @@ from snuariapi.serializers import *
 from snuariapi.services import *
 
 from config import domain
+import datetime
 
 from datetime import datetime
 import pytz
@@ -206,6 +207,48 @@ class EventDetailView(APIView):
         event = Event.objects.get(pk=pk)
         event.delete()
         return Response('')
+   
+class BoardListView(APIView):
+    def get(self, request):
+        board = Board.objects.all()
+        serializer = BoardListSerializer(board, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        club_id = request.data.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club does not exist', status=400)
+
+        serializer = BoardListSerializer(data=request.data)
+        if serializer.is_valid():
+            board = serializer.save()
+            board.club = club
+            board.save()
+            return Response({'id':board.id})
+        return Response('', status=400) # Something Wrong
+
+class BoardDetailView(APIView):
+    def get(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        serializer = BoardDetailSerializer(board)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        serializer = BoardDetailSerializer(board, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        board = Board.objects.get(pk=pk)
+        board.delete()
+        return Response('')
 
 class EventFutureAttendeeView(APIView):
     def post(self, request, pk=None):
@@ -285,4 +328,128 @@ class EventStatisticView(APIView):
         final = event.filter(past_attendees=user)
         attendence_rate = len(final) / len(event)
         return Response({'attendence_rate': attendence_rate, 'absent_count': absent_count})
+
+class ArticleListView(APIView):
+    def get(self, request):
+        article = Article.objects.all()
+        serializer = ArticleSerializer(article, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        board_id = request.data.get('board_id', None)
+        if board_id is None:
+            return Response('board id is required', status=400)
+
+        board = Board.objects.filter(id=board_id).first()
+        if board is None:
+            return Response('board does not exist', status=400)
+
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid():
+            article = serializer.save()
+            article.writer = request.user
+            article.board = board
+            article.save()
+            return Response({'id':article.id})
+        return Response('', status=400) # Something Wrong
+
+class ArticleDetailView(APIView):
+    def get(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid():
+            article = serializer.save()
+            article.updated_at = datetime.datetime.now()
+            article.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        article.delete()
+        return Response('')
+      
+class AccountingListView(APIView):
+    def get(self, request):
+        club_id = request.GET.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        account = club.club_accounting.all()
+        serializer = AccountingSerializer(account, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        club_id = request.data.get('club_id', None)
+        if club_id is None:
+            return Response('club id is required', status=400)
+          
+        club = Club.objects.filter(id=club_id).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        serializer = AccountingSerializer(data=request.data)
+        if serializer.is_valid():
+            account = serializer.save()
+            account.writer = request.user
+            account.club = club
+            account.save()
+            return Response({"id": account.id})
+        return Response(serializer.errors, status=400)
+
+class AccountingDetailView(APIView):
+    def get(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        serializer = AccountingSerializer(account)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        serializer = AccountingSerializer(account, data=request.data, partial=True)
+        if serializer.is_valid():
+            account = serializer.save()
+            account.updated_at = datetime.datetime.now()
+            account.save()
+            return Response('')
+        return Response('', status=400)
+
+    def delete(self, request, pk=None):
+        account = Accounting.objects.get(pk=pk)
+        account.delete()
+        return Response('')
+        
+class AccountingStatisticView(APIView):
+    def get(self, request, pk=None):
+        club = Club.objects.filter(pk=pk).first()
+        if club is None:
+            return Response('club is not exist', status=400)
+        account = club.club_accounting.all()
+
+        start_from = request.GET.get('start_from', '1990-01-01')
+        end_until = request.GET.get('end_until', datetime.datetime.now().strftime('%Y-%m-%d'))
+        account = account.filter(date__range=(start_from, end_until))
+
+        only = request.GET.get('only', 'all')
+        if only == 'all':
+            pass
+        elif only == 'income':
+            account = account.filter(is_income=True)
+        elif only == 'outgo':
+            account = account.filter(is_income=False)
+
+        serializer = AccountingSerializer(account, many=True)
+        total = 0
+        for ac in account:
+            if ac.is_income:
+                total += ac.money
+            else:
+                total -= ac.money
+
+        return Response({'total': total, 'accountings': serializer.data})
 

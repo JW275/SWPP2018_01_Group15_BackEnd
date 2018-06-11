@@ -19,14 +19,22 @@ from django.conf.urls import url, include
 from snuariapi import views
 
 urlpatterns = [
-    url(r'^login/$', views.LoginView.as_view()),
-    url(r'^logout/$', views.LogoutView.as_view()),
-    url(r'^me/$', views.UserSelfView.as_view()),
-    url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view()),
-    url(r'^club/$', views.ClubListView.as_view()),
-    url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view()),
-    url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view()),
-    url(r'^api-auth/', include('rest_framework.urls')),
+    url(r'^login/$', views.LoginView.as_view(), name='login'),
+    url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+    url(r'^me/$', views.UserSelfView.as_view(), name='user_self'),
+    url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view(), name='user_detail'),
+    url(r'^club/$', views.ClubListView.as_view(), name='club_list'),
+    url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view(), name='club_detail'),
+    url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view(), name='club_join'),
+    url(r'^signup/$', views.SignupView.as_view(), name='signup'),
+    url(r'^verify/$', views.VerifyView.as_view(), name='verify'),
+    url(r'^board/$', views.BoardListView.as_view(), name='board_list'),
+    url(r'^board/(?P<pk>[0-9]+)/$', views.BoardDetailView.as_view(), name='board_detail'),
+    url(r'^article/$', views.ArticleListView.as_view(), name='board_list'),
+    url(r'^article/(?P<pk>[0-9]+)/$', views.ArticleDetailView.as_view(), name='board_detail'),
+    url(r'^account/$', views.AccountingListView.as_view()),
+    url(r'^account/(?P<pk>[0-9]+)/$', views.AccountingDetailView.as_view()),
+    url(r'^account/statistic/(?P<pk>[0-9]+)/$', views.AccountingStatisticView.as_view()),
     url(r'^signup/$', views.SignupView.as_view()),
     url(r'^verify/$', views.VerifyView.as_view()),
     url(r'^event/$', views.EventListView.as_view(), name='event_list'),
@@ -35,5 +43,5 @@ urlpatterns = [
     url(r'^event/(?P<pk>[0-9]+)/future_absentee/$', views.EventFutureAbsenteeView.as_view(), name='event_future_absentee'),
     url(r'^event/(?P<pk>[0-9]+)/past_attendee/$', views.EventPastAttendeeView.as_view(), name='event_past_attendee'),
     url(r'^event/(?P<pk>[0-9]+)/analysis/$', views.EventStatisticView.as_view(), name='event_past_attendee'),
-
+    url(r'^api-auth/', include('rest_framework.urls')),
 ]

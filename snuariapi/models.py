@@ -38,10 +38,6 @@ class Club(models.Model):
     category = models.CharField(max_length=20)
     introduction = models.TextField()
 
-class Board(models.Model):
-    name = models.CharField(max_length=20)
-    club = models.ForeignKey(Club, related_name='boards', on_delete=models.CASCADE)
-
 class Event(models.Model):
     name = models.CharField(max_length=20)
     content = models.TextField()
@@ -52,3 +48,25 @@ class Event(models.Model):
     future_absentees = models.ManyToManyField(User, related_name='future_absent_events')
     # have attended (past event)
     past_attendees = models.ManyToManyField(User, related_name='past_attend_events')
+    
+class Board(models.Model):
+    name = models.CharField(max_length=20)
+    club = models.ForeignKey(Club, related_name='board_club', on_delete=models.CASCADE, null=True)
+
+class Article(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    writer = models.ForeignKey(User, models.CASCADE, related_name='article_writer', null=True)
+    board = models.ForeignKey(Board, models.CASCADE, related_name='article_board', null=True)
+    title = models.CharField(max_length=40)
+    content = models.TextField()
+
+class Accounting(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    club = models.ForeignKey(Club, models.CASCADE, related_name='club_accounting', null=True)
+    is_income = models.BooleanField()
+    money = models.IntegerField()
+    date = models.DateField()
+    writer = models.ForeignKey(User, models.CASCADE, related_name='account_writer', null=True)
+    content = models.TextField()
