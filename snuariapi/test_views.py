@@ -219,22 +219,6 @@ class ClubMemberViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(self.club.members.filter(pk=self.user.id).first())
 
-class SignupViewTests(TestCase):
-    def test_signup(self):
-        path = reverse('signup')
-        data = {
-            'name': 'test',
-            'username': 'test',
-            'password': 'test',
-            'email': 'test@snu.ac.kr',
-            'college': '공과대학',
-            'major': '컴퓨터공학부',
-            'admission_year': 2015
-        }
-
-        response = self.client.post(path=path, data=data)
-        self.assertEqual(response.status_code, 200)
-
 class VerifyViewTests(TestCase):
     def setUp(self):
         self.user = create_user('test', 'test', 'test@test.com', 'test', '공과대학', '컴퓨터공학부', 2015)
