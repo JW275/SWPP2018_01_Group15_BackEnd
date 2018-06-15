@@ -9,9 +9,10 @@ class UserSimpleSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     clubs_as_admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_admin')
     clubs_as_members = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_members')
+    clubs_as_waitings = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_waitings')
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'clubs_as_admin', 'clubs_as_members',)
+        fields = ('id', 'username', 'email', 'clubs_as_admin', 'clubs_as_members', 'clubs_as_waitings',)
 
 class BoardListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -23,15 +24,22 @@ class ClubListSerializer(serializers.HyperlinkedModelSerializer):
         model = Club
         fields = ('id', 'name', 'scope', 'category', 'introduction',)
 
+class AccountingSerializer(serializers.HyperlinkedModelSerializer):
+    writer = UserSimpleSerializer(read_only=True)
+    class Meta:
+        model = Accounting
+        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content',)
+
 class ClubDetailSerializer(serializers.HyperlinkedModelSerializer):
     admin = UserSimpleSerializer(many=True, read_only=True)
     members = UserSimpleSerializer(many=True, read_only=True)
     waitings = UserSimpleSerializer(many=True, read_only=True)
     boards = BoardListSerializer(many=True, read_only=True, source='board_club')
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    accounts = AccountingSerializer(many=True, read_only=True, source='club_accounting')
     class Meta:
         model = Club
-        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction', 'boards', 'events',)
+        fields = ('id', 'name', 'admin', 'members', 'waitings', 'scope', 'category', 'introduction', 'boards', 'events', 'accounts',)
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -51,9 +59,10 @@ class UserInfoSerializer(serializers.HyperlinkedModelSerializer):
     admission_year = serializers.IntegerField(source='profile.admission_year', read_only=True)
     clubs_as_admin = ClubListSerializer(many=True, source='club_admin')
     clubs_as_members = ClubListSerializer(many=True, source='club_members')
+    clubs_as_waitings = ClubListSerializer(many=True, source='club_waitings')
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members',)
+        fields = ('id', 'username', 'email', 'name', 'college', 'major', 'admission_year', 'clubs_as_admin', 'clubs_as_members', 'clubs_as_waitings',)
 
 
 class EventListSerializer(serializers.HyperlinkedModelSerializer):
@@ -99,8 +108,3 @@ class BoardDetailSerializer(serializers.HyperlinkedModelSerializer):
         model = Board
         fields = ('id', 'name', 'articles',)
 
-class AccountingSerializer(serializers.HyperlinkedModelSerializer):
-    writer = serializers.PrimaryKeyRelatedField(read_only=True)
-    class Meta:
-        model = Accounting
-        fields = ('id', 'created_at', 'updated_at', 'is_income', 'money', 'date', 'writer', 'content',)

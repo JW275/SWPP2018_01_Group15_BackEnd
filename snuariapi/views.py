@@ -110,7 +110,7 @@ class ClubMemberView(APIView):
         user = club.waitings.filter(id=uid).first()
         if user is not None:
             club.waitings.remove(user)
-            club.waitings.add(user)
+            club.members.add(user)
             club.save()
             return Response('')
         
@@ -411,7 +411,7 @@ class ArticleListView(APIView):
         if board is None:
             return Response('board does not exist', status=400)
 
-        article = board.article_board.all()
+        article = board.article_board.all()[::-1]
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data)
 
@@ -444,7 +444,7 @@ class ArticleDetailView(APIView):
         serializer = ArticleSerializer(article, data=request.data, partial=True)
         if serializer.is_valid():
             article = serializer.save()
-            article.updated_at = datetime.datetime.now()
+            article.updated_at = datetime.now()
             article.save()
             return Response('')
         return Response('', status=400)
@@ -494,7 +494,7 @@ class AccountingDetailView(APIView):
         serializer = AccountingSerializer(account, data=request.data, partial=True)
         if serializer.is_valid():
             account = serializer.save()
-            account.updated_at = datetime.datetime.now()
+            account.updated_at = datetime.now()
             account.save()
             return Response('')
         return Response('', status=400)
@@ -574,7 +574,7 @@ class CommentDetailView(APIView):
         serializer = CommentSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid():
             comment = serializer.save()
-            comment.updated_at = datetime.datetime.now()
+            comment.updated_at = datetime.now()
             comment.save()
             return Response('')
         return Response('', status=400)
