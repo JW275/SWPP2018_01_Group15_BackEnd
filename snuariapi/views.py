@@ -116,6 +116,9 @@ class ClubMemberView(APIView):
         
         user = club.admin.filter(id=uid).first()
         if user is not None:
+            admins = club.admin.all()
+            if len(admins) == 1:
+                return Response('admin has to be more than one', status=400)
             club.admin.remove(user)
             club.save()
             return Response('')
@@ -135,10 +138,12 @@ class ClubMemberView(APIView):
 
         user = club.members.filter(id=uid).first()
         if user is not None:
-            club.members.remove(user)
             user = club.admin.filter(id=uid).first()
             if user is not None:
+                if len(club.admin.all()) == 1:
+                    return Response('admin has to be more than one', status=400)
                 club.admin.remove(user)
+            club.members.remove(user)
             club.save()
             return Response('')
 
