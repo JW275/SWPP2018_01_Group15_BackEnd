@@ -342,7 +342,8 @@ class EventFutureAttendeeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
     def delete(self, request, pk=None):
@@ -351,7 +352,8 @@ class EventFutureAttendeeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
 class EventFutureAbsenteeView(APIView):
@@ -362,7 +364,8 @@ class EventFutureAbsenteeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
     def delete(self, request, pk=None):
@@ -371,7 +374,8 @@ class EventFutureAbsenteeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
 class EventPastAttendeeView(APIView):

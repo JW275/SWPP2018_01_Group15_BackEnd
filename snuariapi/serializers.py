@@ -3,9 +3,12 @@ from snuariapi.models import *
 
 class UserSimpleSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='profile.name', read_only=True)
+    college = serializers.CharField(source='profile.college', read_only=True)
+    major = serializers.CharField(source='profile.major', read_only=True)
+    admission_year = serializers.IntegerField(source='profile.admission_year', read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'username', 'name',)
+        fields = ('id', 'username', 'name', 'college', 'major', 'admission_year',)
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     clubs_as_admin = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='club_admin')
