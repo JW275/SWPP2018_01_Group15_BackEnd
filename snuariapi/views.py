@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.utils.crypto import get_random_string
+from django.db.models import Q
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -110,12 +111,15 @@ class ClubMemberView(APIView):
         user = club.waitings.filter(id=uid).first()
         if user is not None:
             club.waitings.remove(user)
-            club.waitings.add(user)
+            club.members.add(user)
             club.save()
             return Response('')
         
         user = club.admin.filter(id=uid).first()
         if user is not None:
+            admins = club.admin.all()
+            if len(admins) == 1:
+                return Response('admin has to be more than one', status=400)
             club.admin.remove(user)
             club.save()
             return Response('')
@@ -135,10 +139,12 @@ class ClubMemberView(APIView):
 
         user = club.members.filter(id=uid).first()
         if user is not None:
-            club.members.remove(user)
             user = club.admin.filter(id=uid).first()
             if user is not None:
+                if len(club.admin.all()) == 1:
+                    return Response('admin has to be more than one', status=400)
                 club.admin.remove(user)
+            club.members.remove(user)
             club.save()
             return Response('')
 
@@ -198,6 +204,25 @@ class VerifyView(APIView):
         vtoken.delete()
 
         return Response('')
+
+class ClubSearchView(APIView):
+    def get(self, request):
+        club = Club.objects.all()
+
+        q = request.GET.get('q', None)
+        if q:
+            club = club.filter(Q(name__contains=q) | Q(introduction__contains=q))
+
+        category = request.GET.get('category', None)
+        if category:
+            club = club.filter(category=category)
+
+        scope = request.GET.get('scope', None)
+        if scope:
+            club = club.filter(scope=scope)
+
+        serializer = ClubListSerializer(club, many=True)
+        return Response(serializer.data)
 
 class EventListView(APIView):
     def get(self, request):
@@ -317,7 +342,8 @@ class EventFutureAttendeeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
     def delete(self, request, pk=None):
@@ -326,7 +352,8 @@ class EventFutureAttendeeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
 class EventFutureAbsenteeView(APIView):
@@ -337,7 +364,8 @@ class EventFutureAbsenteeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
     def delete(self, request, pk=None):
@@ -346,7 +374,8 @@ class EventFutureAbsenteeView(APIView):
         event.save()
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'name': request.user.profile.name
         })
 
 class EventPastAttendeeView(APIView):
@@ -396,7 +425,7 @@ class ArticleListView(APIView):
         if board is None:
             return Response('board does not exist', status=400)
 
-        article = board.article_board.all()
+        article = board.article_board.all()[::-1]
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data)
 
@@ -429,7 +458,7 @@ class ArticleDetailView(APIView):
         serializer = ArticleSerializer(article, data=request.data, partial=True)
         if serializer.is_valid():
             article = serializer.save()
-            article.updated_at = datetime.datetime.now()
+            article.updated_at = datetime.now()
             article.save()
             return Response('')
         return Response('', status=400)
@@ -479,7 +508,7 @@ class AccountingDetailView(APIView):
         serializer = AccountingSerializer(account, data=request.data, partial=True)
         if serializer.is_valid():
             account = serializer.save()
-            account.updated_at = datetime.datetime.now()
+            account.updated_at = datetime.now()
             account.save()
             return Response('')
         return Response('', status=400)
@@ -497,7 +526,8 @@ class AccountingStatisticView(APIView):
         account = club.club_accounting.all()
 
         start_from = request.GET.get('start_from', '1990-01-01')
-        end_until = request.GET.get('end_until', datetime.datetime.now().strftime('%Y-%m-%d'))
+        #end_until = request.GET.get('end_until', datetime.now().strftime('%Y-%m-%d'))
+        end_until = request.GET.get('end_until', '9999-12-31')
         account = account.filter(date__range=(start_from, end_until))
 
         only = request.GET.get('only', 'all')
@@ -559,7 +589,7 @@ class CommentDetailView(APIView):
         serializer = CommentSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid():
             comment = serializer.save()
-            comment.updated_at = datetime.datetime.now()
+            comment.updated_at = datetime.now()
             comment.save()
             return Response('')
         return Response('', status=400)

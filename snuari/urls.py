@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^me/$', views.UserSelfView.as_view(), name='user_self'),
     url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetailView.as_view(), name='user_detail'),
     url(r'^club/$', views.ClubListView.as_view(), name='club_list'),
+    url(r'^club/search/$', views.ClubSearchView.as_view(), name='club_search'),
     url(r'^club/(?P<pk>[0-9]+)/$', views.ClubDetailView.as_view(), name='club_detail'),
     url(r'^club/(?P<pk>[0-9]+)/join/$', views.ClubJoinView.as_view(), name='club_join'),
     url(r'^club/(?P<club_id>[0-9]+)/member/(?P<uid>[0-9]+)/$', views.ClubMemberView.as_view(), name='club_member'),
