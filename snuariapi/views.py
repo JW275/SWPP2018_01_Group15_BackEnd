@@ -522,7 +522,8 @@ class AccountingStatisticView(APIView):
         account = club.club_accounting.all()
 
         start_from = request.GET.get('start_from', '1990-01-01')
-        end_until = request.GET.get('end_until', datetime.datetime.now().strftime('%Y-%m-%d'))
+        #end_until = request.GET.get('end_until', datetime.now().strftime('%Y-%m-%d'))
+        end_until = request.GET.get('end_until', '9999-12-31')
         account = account.filter(date__range=(start_from, end_until))
 
         only = request.GET.get('only', 'all')
