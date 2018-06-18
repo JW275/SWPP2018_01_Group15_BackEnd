@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.utils.crypto import get_random_string
+from django.db.models import Q
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -208,13 +209,17 @@ class ClubSearchView(APIView):
     def get(self, request):
         club = Club.objects.all()
 
-        name = request.GET.get('name', None)
-        if name:
-            club = club.filter(name__contains=name)
+        q = request.GET.get('q', None)
+        if q:
+            club = club.filter(Q(name__contains=q) | Q(introduction__contains=q))
 
         category = request.GET.get('category', None)
         if category:
             club = club.filter(category=category)
+
+        scope = request.GET.get('scope', None)
+        if scope:
+            club = club.filter(scope=scope)
 
         serializer = ClubListSerializer(club, many=True)
         return Response(serializer.data)
