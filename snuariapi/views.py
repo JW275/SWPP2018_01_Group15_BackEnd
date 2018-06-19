@@ -15,10 +15,8 @@ from config import domain
 import datetime
 
 from datetime import datetime
-import pytz
+from pytz import timezone
 
-utc = pytz.UTC
-now = datetime.now().replace(tzinfo=utc)
 
 class LoginView(APIView):
     def post(self, request):
@@ -226,6 +224,9 @@ class ClubSearchView(APIView):
 
 class EventListView(APIView):
     def get(self, request):
+        kr = timezone('Asia/Seoul')
+        now = datetime.now().replace(tzinfo=kr)
+
         time = request.GET.get('need', None)
         clubid = request.GET.get('clubid', None)
         if clubid == None:
@@ -242,6 +243,9 @@ class EventListView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        kr = timezone('Asia/Seoul')
+        now = datetime.now().replace(tzinfo=kr)
+
         if request.user.is_anonymous:
             return Response('user', status=400)
         club_id = request.data.get('club', None)
